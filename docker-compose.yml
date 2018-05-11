@@ -5,7 +5,7 @@ services:
     build: .
     environment:
       - MODE=dev
-      - ELASTICSEARCH_HOST=127.0.0.1
+      - ELASTICSEARCH_HOST=elasticsearch
       - ELASTICSEARCH_PORT=9200
     volumes:
       - .:/code
