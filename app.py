@@ -8,6 +8,7 @@ from connexion.resolver import RestyResolver
 from services.elasticsearch import ElasticSearchIndex, ElasticSearchFactory
 from conf.elasticsearch_mapper import room_mapping
 import logging
+import graypy
 #from services.provider import ItemsProvider
 
 
@@ -16,6 +17,8 @@ import logging
 #         ItemsProvider,
 #         ItemsProvider([{"Name": "Test 1"}])
 #     )
+
+
 def configure(binder: Binder) -> Binder:
   binder.bind(
     ElasticSearchIndex,
@@ -34,10 +37,15 @@ def configure(binder: Binder) -> Binder:
 
 
 if __name__ == '__main__':
-  logging.basicConfig(level=logging.INFO, filename='app.log')
+  # logging.basicConfig(level=logging.INFO, filename='app.log')
   app = connexion.App(__name__, specification_dir='swagger/')
   app.add_api('indexer.yaml', resolver=RestyResolver('api'))
   FlaskInjector(app=app.app, modules=[configure])
+  handler = graypy.GELFHandler(os.environ['GRAYLOG_HOST'], int(os.environ['GRAYLOG_PORT']))
+  # app.logger.addHandler(handler)
+  logger = logging.getLogger('app')
+  logger.setLevel(logging.INFO)
+  logger.addHandler(handler)
   app.run(port=9090)
 
 # if __name__ == '__main__':
